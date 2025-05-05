@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('feelio-user', JSON.stringify(userFromServer));
     } catch (error) {
       console.error('Login failed:', error);
-      throw error; // so you can show backend error in UI
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -66,11 +66,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         segment: segmentNumber,
       });
 
-      // ✅ login only needs email + password
-      await login({ email: data.email, password: data.password });
+      // ✅ no auto-login — navigate in Signup.tsx after this
     } catch (error) {
       console.error('Signup failed:', error);
-      throw error; // same: pass to UI
+      throw error;
     } finally {
       setLoading(false);
     }
