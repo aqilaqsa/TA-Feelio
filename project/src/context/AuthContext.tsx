@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { User, UserSegment, AuthFormData } from '../types';
 
 interface AuthContextType {
@@ -11,22 +12,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user data
-const mockUser: User = {
-  id: '1',
-  name: 'Budi',
-  email: 'budi@example.com',
-  segment: '7-9',
-  totalScore: 120,
-  createdAt: new Date().toISOString(),
-};
+// ✅ VITE backend API base URL
+const API = import.meta.env.VITE_API_BASE;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
     const storedUser = localStorage.getItem('feelio-user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -37,15 +30,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (data: AuthFormData) => {
     setLoading(true);
     try {
-      // Mock API call - in real app, this would be a fetch request to the backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Use the mock user for now
-      setUser(mockUser);
-      localStorage.setItem('feelio-user', JSON.stringify(mockUser));
+      const response = await axios.post(`${API}/login`, {
+        email: data.email,
+        password: data.password,
+      });
+
+      const userFromServer: User = {
+        id: String(response.data.user_id),
+        name: response.data.name,
+        email: data.email,
+        segment: response.data.segment === 1 ? '7-9' : '10-12',
+        totalScore: 0,
+        createdAt: new Date().toISOString(),
+      };
+
+      setUser(userFromServer);
+      localStorage.setItem('feelio-user', JSON.stringify(userFromServer));
     } catch (error) {
       console.error('Login failed:', error);
-      throw new Error('Login failed');
+      throw error; // so you can show backend error in UI
     } finally {
       setLoading(false);
     }
@@ -54,23 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (data: AuthFormData) => {
     setLoading(true);
     try {
-      // Mock API call - in real app, this would be a fetch request to the backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a new user with the provided data
-      const newUser: User = {
-        ...mockUser,
-        name: data.name || 'User',
+      const segmentNumber = data.segment === '7-9' ? 1 : 2;
+
+      await axios.post(`${API}/signup`, {
+        name: data.name,
         email: data.email,
-        segment: data.segment || '7-9',
-        totalScore: 0,
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('feelio-user', JSON.stringify(newUser));
+        password: data.password,
+        segment: segmentNumber,
+      });
+
+      // ✅ login only needs email + password
+      await login({ email: data.email, password: data.password });
     } catch (error) {
       console.error('Signup failed:', error);
-      throw new Error('Signup failed');
+      throw error; // same: pass to UI
     } finally {
       setLoading(false);
     }
