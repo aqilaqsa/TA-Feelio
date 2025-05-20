@@ -14,6 +14,9 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Learn from './pages/Learn';
 import Achievements from './pages/Achievements';
+import Statistics from './pages/Statistics';
+import Playground from './pages/Playground';
+import PendampingDashboard from './pages/PendampingDashboard';
 
 function App() {
   return (
@@ -49,6 +52,30 @@ function App() {
                 <Achievements />
               </ProtectedRoute>
             } 
+          />
+          <Route 
+            path="/statistics" 
+            element={
+              <ProtectedRoute> 
+                <Statistics />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/playground" 
+            element={
+              <ProtectedRoute>
+                <Playground />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/pendamping" 
+            element={
+              <ProtectedRoute>
+                <PendampingDashboard />
+              </ProtectedRoute>
+            }
           />
 
           {/* Fallback route */}

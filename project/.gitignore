@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+project/src/backend/emotion_model/model.safetensors
+

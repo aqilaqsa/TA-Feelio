@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
+import os
 
 emotion = Blueprint("emotion", __name__)
 
 # Load model & tokenizer ONCE
-model_path = "src/backend/emotion_model"  # adjust path as needed
+model_path = os.path.join(os.path.dirname(__file__), "..", "emotion_model")
+model_path = os.path.abspath(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 model.eval()

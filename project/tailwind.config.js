@@ -1,8 +1,15 @@
+import { Weight } from 'lucide-react';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      backgroundImage: {
+        'paw-pattern': "url('/img/paw-pattern.png')",
+        'yarn-pattern': "url('/img/yarn-loop.png')",
+        'playground-bg': "url('/img/playground-bg.png')",
+      },
       fontFamily: {
         sans: ['Nunito', 'sans-serif'],
       },
@@ -52,6 +59,17 @@ export default {
           '0%, 100%': { opacity: 1 },
           '50%': { opacity: 0.5 },
         },
+        weight: {
+            thin: '100',
+            extralight: '200',
+            light: '300',
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700',
+            extrabold: '800',
+            black: '900',
+        }
       },
     },
   },

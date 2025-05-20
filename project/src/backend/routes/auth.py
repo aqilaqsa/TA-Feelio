@@ -8,15 +8,19 @@ auth = Blueprint("auth", __name__)
 @auth.route("/signup", methods=["POST"])
 def signup():
     data = request.json
+
     if User.query.filter_by(email=data["email"]).first():
         return jsonify({"error": "Email sudah terdaftar"}), 400
 
     hashed_pw = bcrypt.hash(data["password"])
+
     new_user = User(
         name=data["name"],
         email=data["email"],
         password_hash=hashed_pw,
-        segment=data["segment"]
+        segment=data["segment"],
+        role=data.get("role", "kid"),
+        parent_id=data.get("parent_id")
     )
     db.session.add(new_user)
     db.session.commit()
@@ -31,8 +35,21 @@ def login():
         return jsonify({"error": "Email atau password salah"}), 401
 
     return jsonify({
-        "message": "Login berhasil",
-        "user_id": user.id,
-        "name": user.name,
-        "segment": user.segment
-    }), 200
+    "message": "Login berhasil",
+    "user_id": user.id,
+    "name": user.name,
+    "segment": user.segment,
+    "role": user.role
+}), 200
+
+@auth.route("/pendamping/<int:id>/children", methods=["GET"])
+def get_children(id):
+    users = User.query.filter_by(parent_id=id).all()
+    return jsonify([
+        {
+            "id": u.id,
+            "name": u.name,
+            "email": u.email,
+            "segment": u.segment
+        } for u in users
+    ])

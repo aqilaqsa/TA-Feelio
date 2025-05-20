@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
@@ -7,10 +7,10 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isImpersonating } = useAuth();
+  const location = useLocation();
 
   if (loading) {
-    // You could render a loading spinner here
     return (
       <div className="min-h-screen flex items-center justify-center bg-purple-50">
         <div className="text-center">
@@ -23,6 +23,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // 🛑 Block true child accounts from accessing restricted routes
+  const kidBlockedRoutes = ['/statistics']; // add more if needed
+  const isKidTryingToAccessRestricted = user.role === 'kid' && !isImpersonating && kidBlockedRoutes.includes(location.pathname);
+
+  if (isKidTryingToAccessRestricted) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
