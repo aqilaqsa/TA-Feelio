@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 project/src/backend/emotion_model/model.safetensors
-
+.env
